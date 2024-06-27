@@ -6,17 +6,18 @@
   </head>
 
   <body>
-    <div id="app"></div>
 
-    <form>
+    <form id="dynamicForm">
+       <div id="dynamicTextBoxContainer">
   <div class="form-group">
     <label for="NomeCognome">Nome e Cognome</label>
     <input class="form-control" id="NomeCognome">
   </div>
   <div class="form-group">
-    <label for="Lavoro1">Lavoro 1/label>
+    <label for="Lavoro1">Lavoro 1</label>
     <input class="form-control" id="Lavoro1">
   </div>
+         </div>
       <button type="button" class="btn btn-primary mt-3" onclick="addNewTextBox()">Aggiungi un altro lavoro</button>
 </form>
 
@@ -35,8 +36,8 @@
       var newTextBoxDiv = document.createElement('div');
       newTextBoxDiv.classList.add('form-group');
       newTextBoxDiv.innerHTML = `
-        <label for="nomeCognome${counter}">Nome e cognome</label>
-        <input type="text" class="form-control" id="nomeCognome${counter}" name="nomeCognome[]" placeholder="Inserisci il tuo nome e cognome">
+        <label for="nomeCognome${counter}">Lavoro ${counter}</label>
+        <input type="text" class="form-control" id="Lavoro${counter}" name="Lavoro[]">
       `;
       document.getElementById('dynamicTextBoxContainer').appendChild(newTextBoxDiv);
     }
