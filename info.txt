@@ -1,3 +1,9 @@
 https://dev.to/iainfreestone/how-to-create-a-word-document-with-javascript-24oi
 https://docx.js.org/#/?id=welcome
 WordArt save as picture
+
+caselle di testo informazioni
+
+60% inizio dei lavori, 40% consegna
+
+get current date
