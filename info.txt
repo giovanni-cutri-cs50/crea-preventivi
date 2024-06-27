@@ -1,0 +1,2 @@
+https://dev.to/iainfreestone/how-to-create-a-word-document-with-javascript-24oi
+https://docx.js.org/#/?id=welcome
