@@ -25,7 +25,7 @@
 
 
     
-    <button id="generate">Crea Preventivo</button>
+    <button id="generate" onclick="generate()">Crea Preventivo</button>
     <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.min.js"></script>
     <script>
 
@@ -42,7 +42,7 @@
       document.getElementById('dynamicTextBoxContainer').appendChild(newTextBoxDiv);
     }
 
-      
+      function generate() {
       // Use the global variable or function provided by the library
       const { Document, Packer, Paragraph, TextRun } = window.docx;
   
@@ -93,6 +93,8 @@ Packer.toBlob(doc).then(blob => {
 }).catch(error => {
   console.error('Error creating document:', error);
 });
+
+      }
     </script>
 
 
