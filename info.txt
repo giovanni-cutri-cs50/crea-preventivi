@@ -7,3 +7,5 @@ caselle di testo informazioni
 60% inizio dei lavori, 40% consegna
 
 get current date
+
+indenta
