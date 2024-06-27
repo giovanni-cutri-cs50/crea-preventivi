@@ -7,14 +7,16 @@
 
   <body>
 
+    <h1>Creatore di Preventivi</h1>
+
     <form id="dynamicForm">
        <div id="dynamicTextBoxContainer">
   <div class="form-group">
-    <label for="NomeCognome">Nome e Cognome</label>
+    <label for="NomeCognome"><b>Nome e Cognome</b></label>
     <input class="form-control" id="NomeCognome">
   </div>
   <div class="form-group">
-    <label for="Lavoro1">Lavoro 1</label>
+    <label for="Lavoro1"></b>Lavoro 1</b></label>
     <input class="form-control" id="Lavoro1">
   </div>
          </div>
@@ -36,7 +38,7 @@
       var newTextBoxDiv = document.createElement('div');
       newTextBoxDiv.classList.add('form-group');
       newTextBoxDiv.innerHTML = `
-        <label for="nomeCognome${counter}">Lavoro ${counter}</label>
+        <label for="nomeCognome${counter}"></b>Lavoro ${counter}</b></label>
         <input type="text" class="form-control" id="Lavoro${counter}" name="Lavoro[]">
       `;
       document.getElementById('dynamicTextBoxContainer').appendChild(newTextBoxDiv);
