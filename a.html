@@ -1,0 +1,66 @@
+<html>
+  <head>
+    <title>Parcel Sandbox</title>
+    <meta charset="UTF-8" />
+  </head>
+
+  <body>
+    <div id="app"></div>
+    <button id="generate">Generate Word Document</button>
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.min.js"></script>
+    <script>
+      // Use the global variable or function provided by the library
+      const { Document, Packer, Paragraph, TextRun } = window.docx;
+  
+      // Create a new document
+      const doc = new Document({
+    sections: [
+        {
+            properties: {},
+            children: [
+                new Paragraph({
+                    children: [
+                        new TextRun("Hello World"),
+                        new TextRun({
+                            text: "Foo Bar",
+                            bold: true,
+                        }),
+                        new TextRun({
+                            text: "\tGithub is the best",
+                            bold: true,
+                        }),
+                    ],
+                }),
+            ],
+        },
+    ],
+});
+
+Packer.toBlob(doc).then(blob => {
+  // Create a blob with the document content
+  const url = URL.createObjectURL(blob);
+
+  // Create a link element
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'My Document.docx';
+
+  // Append the link to the body
+  document.body.appendChild(a);
+
+  // Programmatically click the link to trigger the download
+  a.click();
+
+  // Remove the link from the DOM
+  document.body.removeChild(a);
+
+  // Clean up the URL object
+  URL.revokeObjectURL(url);
+}).catch(error => {
+  console.error('Error creating document:', error);
+});
+    </script>
+
+
+  </body>
+</html>
