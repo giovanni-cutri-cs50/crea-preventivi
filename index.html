@@ -44,34 +44,28 @@
       document.getElementById('dynamicTextBoxContainer').appendChild(newTextBoxDiv);
     }
 
-      function generate() {
+
+
+      async function generate() {
       // Use the global variable or function provided by the library
       const { Document, Packer, Paragraph, TextRun } = window.docx;
-  
-      // Create a new document
-      const doc = new Document({
-    sections: [
-        {
-            properties: {},
-            children: [
-                new Paragraph({
-                    children: [
-                        new TextRun("Hello World"),
-                        new TextRun({
-                            text: "Foo Bar",
-                            bold: true,
-                        }),
-                        new TextRun({
-                            text: "\tGithub is the best",
-                            bold: true,
-                        }),
-                    ],
-                }),
-            ],
-        },
-    ],
-});
+      const imagePath = "logo.png";
+      const [IMAGE_TYPE] = "png"
+      const [IMAGE_BUFFER] = fs.readFileSync(imagePath);
 
+      const imageUrl = "https://example.com/path/to/image.jpg";
+      const response = await fetch(imageUrl);
+      const imageBuffer = await response.arrayBuffer();
+      const image = Media.addImage(doc, imageBuffer);
+
+      const paragraph = new Paragraph(image);
+      const doc = new Document();
+      doc.addSection({
+                children: [paragraph],
+            });
+
+
+     
 Packer.toBlob(doc).then(blob => {
   // Create a blob with the document content
   const url = URL.createObjectURL(blob);
