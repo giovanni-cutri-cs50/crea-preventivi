@@ -1,98 +1,319 @@
 <html>
-  <head>
-    <title>Creatore Preventivi</title>
-    <meta charset="UTF-8" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-  </head>
+    <head>
+        <title>Creatore Preventivi</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+    </head>
+    <body>
+        <h1 style="margin: 0 20px 0 20px;">Creatore di Preventivi</h1>
+        <br />
+        <form id="dynamicForm">
+            <div id="dynamicTextBoxContainer">
+                <div class="form-group">
+                    <label for="CognomeNome" style="margin: 0 20px 0 20px;">
+                        <b>Cognome e Nome</b>
+                    </label>
+                    <input class="form-control" id="CognomeNome" style="margin: 0 20px 0 20px;"/>
+                </div>
+                <br />
+                <div class="form-group">
+                    <label for="Città" style="margin: 0 20px 0 20px;">
+                        <b>Città</b>
+                    </label>
 
-  <body>
+                    <input class="form-control" id="Citta" style="margin: 0 20px 0 20px;"/>
+                </div>
+                <br />
 
-    <h1>Creatore di Preventivi</h1>
+                <div class="form-group">
+                    <label for="Costo" style="margin: 0 20px 0 20px;">
+                        <b>Costo</b>
+                    </label>
 
-    <form id="dynamicForm">
-       <div id="dynamicTextBoxContainer">
-  <div class="form-group">
-    <label for="NomeCognome"><b>Nome e Cognome</b></label>
-    <input class="form-control" id="NomeCognome">
-  </div>
-  <div class="form-group">
-    <label for="Lavoro1"></b>Lavoro 1</b></label>
-    <input class="form-control" id="Lavoro1">
-  </div>
-         </div>
-      <button type="button" class="btn btn-primary mt-3" onclick="addNewTextBox()">Aggiungi un altro lavoro</button>
-</form>
+                    <input class="form-control" id="Costo" style="margin: 0 20px 0 20px;"/>
+                </div>
+                <br />
 
-
-
-
-    
-    <button id="generate" onclick="generate()">Crea Preventivo</button>
-    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.min.js"></script>
-    <script>
-
-      var counter = 1; // Counter to track the number of textboxes
-
-    function addNewTextBox() {
-      counter++;
-      var newTextBoxDiv = document.createElement('div');
-      newTextBoxDiv.classList.add('form-group');
-      newTextBoxDiv.innerHTML = `
-        <label for="nomeCognome${counter}"></b>Lavoro ${counter}</b></label>
-        <input type="text" class="form-control" id="Lavoro${counter}" name="Lavoro[]">
+                <div class="form-group">
+                    <label for="Lavoro1" style="margin: 0 20px 0 20px;">
+                        <b>Lavoro 1</b>
+                    </label>
+                    <input class="form-control" id="Lavoro1" style="margin: 0 20px 0 20px;"/>
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary mt-3" onclick="addNewTextBox()">Aggiungi un altro lavoro</button>
+        </form>
+        <button id="generate" onclick="generate()">Crea Preventivo</button>
+        <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/docx-wasm@0.4.18-rc2/dist/web/index.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/docx-pdf@0.0.1/index.min.js"></script>
+        <script>
+            var counter = 1; // Counter to track the number of textboxes
+            function addNewTextBox() {
+                counter++;
+                var newTextBoxDiv = document.createElement("div");
+                newTextBoxDiv.classList.add("form-group");
+                newTextBoxDiv.innerHTML = `<br>
+        
+							<b><label for="Lavoro${counter}" style="margin: 0 20px 0 20px;">
+							Lavoro ${counter}</b>
+					
+					</label>
+					<input type="text" class="form-control" id="Lavoro${counter}" name="Lavoro[]" style="margin: 0 20px 0 20px;">
       `;
-      document.getElementById('dynamicTextBoxContainer').appendChild(newTextBoxDiv);
-    }
+                document.getElementById("dynamicTextBoxContainer").appendChild(newTextBoxDiv);
+            }
 
+            function generate() {
+                const CognomeNome = document.getElementById("CognomeNome").value;
+                const Citta = document.getElementById("Citta").value;
+                const lavori = [];
 
+                var today = new Date();
+                var dd = String(today.getDate()).padStart(2, "0");
+                var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+                var yyyy = today.getFullYear();
 
-      async function generate() {
-      // Use the global variable or function provided by the library
-      const { Document, Packer, Paragraph, TextRun } = window.docx;
-      const imagePath = "logo.png";
-      const [IMAGE_TYPE] = "png"
+                today = dd + "/" + mm + "/" + yyyy;
 
+                // Collect all lavoro inputs
+                for (let i = 1; i <= counter; i++) {
+                    const lavoroValue = "-" + document.getElementById(`Lavoro${i}`).value;
+                    lavori.push(lavoroValue);
+                }
+                // Direct URL to the image
+                const imageUrl = "https://raw.githubusercontent.com/giovanni-cutri-cs50/crea-preventivi/main/logo.png";
+                fetch(imageUrl)
+                    .then((response) => response.arrayBuffer())
+                    .then((imageBuffer) => {
+                        const { Document, Packer, Paragraph, TextRun, ImageRun } = window.docx;
 
-      const imageUrl = "https://example.com/path/to/image.jpg";
-      const response = await fetch(imageUrl);
-      const imageBuffer = await response.arrayBuffer();
-      const image = Media.addImage(doc, imageBuffer);
+                        childrenLavori = [];
+                        for (let i = 0; i < lavori.length; i++) {
+                            child = [
+                                new Paragraph({
+                                    children: [],
+                                }),
+                                new Paragraph({
+                                    children: [
+                                        // Just newline without text
+                                        new TextRun({
+                                            text: lavori[i],
+                                            font: "Calibri",
+                                            size: 22,
+                                        }),
+                                    ],
+                                }),
+                            ];
 
-      const paragraph = new Paragraph(image);
-      const doc = new Document();
-      doc.addSection({
-                children: [paragraph],
-            });
+                            childrenLavori.push(...child);
+                        }
 
+                        console.log(childrenLavori);
 
-     
-Packer.toBlob(doc).then(blob => {
-  // Create a blob with the document content
-  const url = URL.createObjectURL(blob);
+                        // Create a new document
+                        const doc = new Document({
+                            sections: [
+                                {
+                                    properties: {},
+                                    children: [
+                                        new Paragraph({
+                                            children: [
+                                                new ImageRun({
+                                                    type: "png", // Specify the type of image (e.g., "image/jpeg", "image/png")
+                                                    data: imageBuffer, // Provide the image buffer (ArrayBuffer or Blob)
+                                                    transformation: {
+                                                        width: 253, // Adjust width as needed
+                                                        height: 106, // Adjust height as needed
+                                                    },
+                                                }),
+                                            ],
+                                        }),
+                                        new Paragraph({
+                                            children: [], // Just newline without text
+                                        }),
+                                        new Paragraph({
+                                            children: [], // Just newline without text
+                                        }),
+                                        new Paragraph({
+                                            children: [], // Just newline without text
+                                        }),
+                                        new Paragraph({
+                                            alignment: "right",
+                                            children: [
+                                                new TextRun({
+                                                    text: "SPETT.LE",
+                                                    font: "Calibri",
+                                                    size: 22,
+                                                }),
+                                            ],
+                                        }),
+                                        new Paragraph({
+                                            alignment: "right",
+                                            children: [
+                                                new TextRun({
+                                                    text: document.getElementById("CognomeNome").value,
+                                                    font: "Calibri",
+                                                    size: 22,
+                                                }),
+                                            ],
+                                        }),
+                                        new Paragraph({
+                                            alignment: "right",
+                                            children: [
+                                                new TextRun({
+                                                    text: document.getElementById("Citta").value,
+                                                    font: "Calibri",
+                                                    size: 22,
+                                                }),
+                                            ],
+                                        }),
+                                        new Paragraph({
+                                            children: [], // Just newline without text
+                                        }),
+                                        new Paragraph({
+                                            children: [], // Just newline without text
+                                        }),
 
-  // Create a link element
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'My Document.docx';
+                                        new Paragraph({
+                                            children: [
+                                                new TextRun({
+                                                    text: "OGGETTO: PREVENTIVO",
+                                                    font: "Calibri",
+                                                    size: 22,
+                                                }),
+                                            ],
+                                        }),
+                                        new Paragraph({
+                                            children: [], // Just newline without text
+                                        }),
 
-  // Append the link to the body
-  document.body.appendChild(a);
+                                        new Paragraph({
+                                            children: [
+                                                new TextRun({
+                                                    text: "A seguito V.S. gradita richiesta vi comunichiamo preventivo per la realizzazione dei lavori seguenti:",
+                                                    font: "Calibri",
+                                                    size: 22,
+                                                }),
+                                            ],
+                                        }),
+                                        // spread operator, unpack array
+                                        ...childrenLavori,
+                                        new Paragraph({
+                                            children: [], // Just newline without text
+                                        }),
+                                        new Paragraph({
+                                            children: [], // Just newline without text
+                                        }),
+                                        new Paragraph({
+                                            alignment: "right",
+                                            children: [
+                                                new TextRun({
+                                                    text: "Costo € " + document.getElementById("Costo").value + ",00",
+                                                    font: "Calibri",
+                                                    size: 22,
+                                                }),
+                                                new Paragraph({
+                                                    children: [], // Just newline without text
+                                                }),
+                                                new Paragraph({
+                                                    children: [], // Just newline without text
+                                                }),
+                                                new Paragraph({
+                                                    children: [], // Just newline without text
+                                                }),
+                                                new Paragraph({
+                                                    children: [], // Just newline without text
+                                                }),
+                                                new Paragraph({
+                                                    children: [], // Just newline without text
+                                                }),
+                                                new Paragraph({
+                                                    children: [], // Just newline without text
+                                                }),
 
-  // Programmatically click the link to trigger the download
-  a.click();
+                                                new Paragraph({
+                                                    children: [
+                                                        new TextRun({
+                                                            text: "Pagamento 60% all'inizio dei lavori, 40% alla consegna",
+                                                            font: "Calibri",
+                                                            size: 22,
+                                                        }),
+                                                    ],
+                                                }),
+                                                new Paragraph({
+                                                    children: [], // Just newline without text
+                                                }),
+                                                new Paragraph({
+                                                    children: [], // Just newline without text
+                                                }),
+                                                new Paragraph({
+                                                    children: [], // Just newline without text
+                                                }),
+                                                new Paragraph({
+                                                    children: [], // Just newline without text
+                                                }),
+                                                new Paragraph({
+                                                    children: [], // Just newline without text
+                                                }),
+                                                new Paragraph({
+                                                    children: [], // Just newline without text
+                                                }),
+                                                new Paragraph({
+                                                    children: [], // Just newline without text
+                                                }),
+                                                new Paragraph({
+                                                    children: [], // Just newline without text
+                                                }),
+                                                new Paragraph({
+                                                    children: [
+                                                        new TextRun({
+                                                            text: "Palmi " + today,
+                                                            font: "Calibri",
+                                                            size: 22,
+                                                        }),
+                                                    ],
+                                                }),
+                                            ],
+                                        }),
+                                    ],
+                                },
+                            ],
+                        });
 
-  // Remove the link from the DOM
-  document.body.removeChild(a);
-
-  // Clean up the URL object
-  URL.revokeObjectURL(url);
-}).catch(error => {
-  console.error('Error creating document:', error);
+                        
+var convertToPdf = window.docx-pdf; 
+docxConverter('./input.docx','./output.pdf',function(err,result){
+  if(err){
+    console.log(err);
+  }
+  console.log('result'+result);
 });
 
-      }
-    </script>
-
-
-  </body>
+                        // Generate and download the document
+                        Packer.toBlob(doc)
+                            .then((blob) => {
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement("a");
+                                a.href = url;
+                                a.download = "Preventivo.docx";
+                                document.body.appendChild(a);
+                                a.click();
+                                document.body.removeChild(a);
+                                URL.revokeObjectURL(url);
+                            })
+                            .catch((error) => {
+                                console.error("Error creating document:", error);
+                            });
+                        // Now you have imageBuffer as ArrayBuffer containing the image data
+                        // Use imageBuffer to create ImageRun in your docx generation logic
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching image:", error);
+                    });
+                // Use the collected data to generate the document
+            }
+        </script>
+    </body>
 </html>
