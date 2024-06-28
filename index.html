@@ -12,10 +12,10 @@
     <form id="dynamicForm">
       <div id="dynamicTextBoxContainer">
         <div class="form-group w-50">
-          <label for="CognomeNome" style="margin: 0 20px 0 20px;">
+          <label for="Nome" style="margin: 0 20px 0 20px;">
             <b>Nome</b>
           </label>
-          <input class="form-control" id="CognomeNome" style="margin: 0 20px 0 20px;" />
+          <input class="form-control" id="Nome" style="margin: 0 20px 0 20px;" />
         </div>
         <br />
         <div class="form-group w-50">
@@ -40,12 +40,9 @@
         </div>
       </div>
       <button type="button" class="btn btn-primary mt-3" style="margin: 0 20px 0 20px;" onclick="addNewTextBox()">Aggiungi un altro lavoro</button>
+      <button type="button" class="btn btn-danger mt-3" onclick="removeLastTextBox()">Rimuovi ultimo lavoro</button>
     </form>
     <button id="generate" class="btn btn-success mt-3" style="margin: 0 20px 0 20px;" onclick="generate()">Crea Preventivo</button>
-    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.25.1/docxtemplater.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
       var counter = 1; // Counter to track the number of textboxes
@@ -67,8 +64,26 @@
                `;
         document.getElementById("dynamicTextBoxContainer").appendChild(newTextBoxDiv);
       }
+
+      
+      function removeLastTextBox() {
+        if (counter > 1) {
+        var lastTextBoxDiv = document.getElementById(`Lavoro${counter}`);
+        if (lastTextBoxDiv) {
+            lastTextBoxDiv.remove();
+            labels = document.getElementsByTagName("label");
+            var lastLabel = labels[labels.length - 1];
+            lastLabel.remove();
+            blankLines = document.getElementsByTagName("br");
+            var lastBlankLine = blankLines[blankLines.length - 1];
+            lastBlankLine.remove();
+            counter--;
+        }
+    }
+      }
+
       async function generate() {
-        const CognomeNome = document.getElementById("CognomeNome").value;
+        const Nome = document.getElementById("Nome").value;
         const Citta = document.getElementById("Citta").value;
         const Costo = document.getElementById("Costo").value;
         const lavori = [];
@@ -89,7 +104,7 @@
         pdf.text(text = "SPETT.LE", x = 200, y = 75, options = {
           align: "right"
         })
-        pdf.text(text = CognomeNome, x = 200, y = 80, options = {
+        pdf.text(text = Nome, x = 200, y = 80, options = {
           align: "right"
         })
         pdf.text(text = Citta, x = 200, y = 85, options = {
@@ -110,7 +125,7 @@
         pdf.text(text = "Pagamento 60% all'inizio dei lavori, 40% alla consegna", x = 20, y = j)
         j = j + 50
         pdf.text(text = "Palmi " + today, x = 20, y = j)
-        pdf.save(CognomeNome + ".pdf")
+        pdf.save(Nome + ".pdf")
       }
     </script>
   </body>
