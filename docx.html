@@ -1,0 +1,313 @@
+<html>
+  <head>
+    <title>Creatore Preventivi</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+  </head>
+  <body>
+    <h1 style="margin: 0 20px 0 20px;">Creatore di Preventivi</h1>
+    <br />
+    <form id="dynamicForm">
+      <div id="dynamicTextBoxContainer">
+        <div class="form-group w-50">
+          <label for="Nome" style="margin: 0 20px 0 20px;">
+            <b>Nome</b>
+          </label>
+          <input class="form-control" id="Nome" style="margin: 0 20px 0 20px;" />
+        </div>
+        <br />
+        <div class="form-group w-50">
+          <label for="Città" style="margin: 0 20px 0 20px;">
+            <b>Città</b>
+          </label>
+          <input class="form-control" id="Citta" style="margin: 0 20px 0 20px;" />
+        </div>
+        <br />
+        <div class="form-group w-50">
+          <label for="Costo" style="margin: 0 20px 0 20px;">
+            <b>Costo</b>
+          </label>
+          <input class="form-control" id="Costo" style="margin: 0 20px 0 20px;" />
+        </div>
+        <br />
+        <div class="form-group w-75">
+          <label for="Lavoro1" style="margin: 0 20px 0 20px;">
+            <b>Lavoro 1</b>
+          </label>
+          <input class="form-control" id="Lavoro1" style="margin: 0 20px 0 20px;" />
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary mt-3" style="margin: 0 20px 0 20px;" onclick="addNewTextBox()">Aggiungi un altro lavoro</button>
+      <button type="button" class="btn btn-danger mt-3" onclick="removeLastTextBox()">Rimuovi ultimo lavoro</button>
+    </form>
+    <button id="generate" class="btn btn-success mt-3" style="margin: 0 20px 0 20px;" onclick="generate()">Crea Preventivo</button>
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.25.1/docxtemplater.js"></script>
+    <script>
+      var counter = 1; // Counter to track the number of textboxes
+      function addNewTextBox() {
+        counter++;
+        var newTextBoxDiv = document.createElement("div");
+        newTextBoxDiv.classList.add("form-group");
+        newTextBoxDiv.classList.add("w-75");
+        newTextBoxDiv.innerHTML = `
+				
+				<br>
+					<b>
+						<label for="Lavoro${counter}" style="margin: 0 20px 0 20px;">
+         							Lavoro ${counter}
+						
+						</b>
+					</label>
+					<input type="text" class="form-control" id="Lavoro${counter}" name="Lavoro[]" style="margin: 0 20px 0 20px;">
+               `;
+        document.getElementById("dynamicTextBoxContainer").appendChild(newTextBoxDiv);
+      }
+
+      function removeLastTextBox() {
+        if (counter > 1) {
+        var lastTextBoxDiv = document.getElementById(`Lavoro${counter}`);
+        if (lastTextBoxDiv) {
+            lastTextBoxDiv.remove();
+            labels = document.getElementsByTagName("label");
+            var lastLabel = labels[labels.length - 1];
+            lastLabel.remove();
+            blankLines = document.getElementsByTagName("br");
+            var lastBlankLine = blankLines[blankLines.length - 1];
+            lastBlankLine.remove();
+            counter--;
+        }
+    }
+      }
+      async function generate() {
+        const Nome = document.getElementById("Nome").value;
+        const Citta = document.getElementById("Citta").value;
+        const Costo = document.getElementById("Costo").value;
+        const lavori = [];
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, "0");
+        var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+        var yyyy = today.getFullYear();
+        today = dd + "/" + mm + "/" + yyyy;
+        // Collect all lavoro inputs
+        for (let i = 1; i <= counter; i++) {
+          const lavoroValue = "-" + document.getElementById(`Lavoro${i}`).value;
+          lavori.push(lavoroValue);
+        }
+        // Direct URL to the image
+        const imageUrl = "https://raw.githubusercontent.com/giovanni-cutri-cs50/crea-preventivi/main/logo.png";
+        fetch(imageUrl).then((response) => response.arrayBuffer()).then((imageBuffer) => {
+          const {
+            Document,
+            Packer,
+            Paragraph,
+            TextRun,
+            ImageRun
+          } = window.docx;
+          childrenLavori = [];
+          for (let i = 0; i < lavori.length; i++) {
+            child = [
+              new Paragraph({
+                children: [],
+              }),
+              new Paragraph({
+                children: [
+                  // Just newline without text
+                  new TextRun({
+                    text: lavori[i],
+                    font: "Calibri",
+                    size: 22,
+                  }),
+                ],
+              }),
+            ];
+            childrenLavori.push(...child);
+          }
+          console.log(childrenLavori);
+          // Create a new document
+          const doc = new Document({
+            sections: [{
+              properties: {},
+              children: [
+                new Paragraph({
+                  children: [
+                    new ImageRun({
+                      type: "png", // Specify the type of image (e.g., "image/jpeg", "image/png")
+                      data: imageBuffer, // Provide the image buffer (ArrayBuffer or Blob)
+                      transformation: {
+                        width: 253, // Adjust width as needed
+                        height: 106, // Adjust height as needed
+                      },
+                    }),
+                  ],
+                }),
+                new Paragraph({
+                  children: [], // Just newline without text
+                }),
+                new Paragraph({
+                  children: [], // Just newline without text
+                }),
+                new Paragraph({
+                  children: [], // Just newline without text
+                }),
+                new Paragraph({
+                  alignment: "right",
+                  children: [
+                    new TextRun({
+                      text: "SPETT.LE",
+                      font: "Calibri",
+                      size: 22,
+                    }),
+                  ],
+                }),
+                new Paragraph({
+                  alignment: "right",
+                  children: [
+                    new TextRun({
+                      text: document.getElementById("Nome").value,
+                      font: "Calibri",
+                      size: 22,
+                    }),
+                  ],
+                }),
+                new Paragraph({
+                  alignment: "right",
+                  children: [
+                    new TextRun({
+                      text: document.getElementById("Citta").value,
+                      font: "Calibri",
+                      size: 22,
+                    }),
+                  ],
+                }),
+                new Paragraph({
+                  children: [], // Just newline without text
+                }),
+                new Paragraph({
+                  children: [], // Just newline without text
+                }),
+                new Paragraph({
+                  children: [
+                    new TextRun({
+                      text: "OGGETTO: PREVENTIVO",
+                      font: "Calibri",
+                      size: 22,
+                    }),
+                  ],
+                }),
+                new Paragraph({
+                  children: [], // Just newline without text
+                }),
+                new Paragraph({
+                  children: [
+                    new TextRun({
+                      text: "A seguito V.S. gradita richiesta vi comunichiamo preventivo per la realizzazione dei lavori seguenti:",
+                      font: "Calibri",
+                      size: 22,
+                    }),
+                  ],
+                }),
+                // spread operator, unpack array
+                ...childrenLavori,
+                new Paragraph({
+                  children: [], // Just newline without text
+                }),
+                new Paragraph({
+                  children: [], // Just newline without text
+                }),
+                new Paragraph({
+                  alignment: "right",
+                  children: [
+                    new TextRun({
+                      text: "Costo € " + document.getElementById("Costo").value + ",00",
+                      font: "Calibri",
+                      size: 22,
+                    }),
+                    new Paragraph({
+                      children: [], // Just newline without text
+                    }),
+                    new Paragraph({
+                      children: [], // Just newline without text
+                    }),
+                    new Paragraph({
+                      children: [], // Just newline without text
+                    }),
+                    new Paragraph({
+                      children: [], // Just newline without text
+                    }),
+                    new Paragraph({
+                      children: [], // Just newline without text
+                    }),
+                    new Paragraph({
+                      children: [], // Just newline without text
+                    }),
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: "Pagamento 60% all'inizio dei lavori, 40% alla consegna",
+                          font: "Calibri",
+                          size: 22,
+                        }),
+                      ],
+                    }),
+                    new Paragraph({
+                      children: [], // Just newline without text
+                    }),
+                    new Paragraph({
+                      children: [], // Just newline without text
+                    }),
+                    new Paragraph({
+                      children: [], // Just newline without text
+                    }),
+                    new Paragraph({
+                      children: [], // Just newline without text
+                    }),
+                    new Paragraph({
+                      children: [], // Just newline without text
+                    }),
+                    new Paragraph({
+                      children: [], // Just newline without text
+                    }),
+                    new Paragraph({
+                      children: [], // Just newline without text
+                    }),
+                    new Paragraph({
+                      children: [], // Just newline without text
+                    }),
+                    new Paragraph({
+                      children: [
+                        new TextRun({
+                          text: "Palmi " + today,
+                          font: "Calibri",
+                          size: 22,
+                        }),
+                      ],
+                    }),
+                  ],
+                }),
+              ],
+            }, ],
+          });
+          // Generate and download the document
+          Packer.toBlob(doc).then((blob) => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = Nome + ".docx";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }).catch((error) => {
+            console.error("Error creating document:", error);
+          });
+          // Now you have imageBuffer as ArrayBuffer containing the image data
+          // Use imageBuffer to create ImageRun in your docx generation logic
+        }).catch((error) => {
+          console.error("Error fetching image:", error);
+        });
+      }
+    </script>
+  </body>
+</html>
